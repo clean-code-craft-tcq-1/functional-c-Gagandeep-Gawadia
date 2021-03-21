@@ -7,7 +7,7 @@ compiledStatus computeBatteryState(float monitoredElementValue[noOfElements], fl
 	
 	compiledStatus current_status;
 	
-	//Intialize overall status for every input 
+	//Intialize overall status for every input, the status is inRange by default
 	memset((void*)&current_status , 0, (sizeof(compiledStatus)));
 	current_status.batteryIsOk = true;
 
@@ -24,11 +24,11 @@ compiledStatus computeBatteryState(float monitoredElementValue[noOfElements], fl
 			current_status.elementStatus[elementNo] = aboveRange;
 			current_status.batteryIsOk = false;
 		}
-		else
-		{
-			current_status.elementStatus[elementNo] = inRange;
+		//else
+		//{
+		//	current_status.elementStatus[elementNo] = inRange;
 			//current_status.batteryIsOk = true; // do not overwrite true at anytime once the bit is set to false
-		}
+		//}
 	}
 
 	return current_status;
