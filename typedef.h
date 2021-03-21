@@ -30,7 +30,13 @@ typedef enum status {
 typedef struct compiledstatus
 {
 	status elementStatus[noOfElements];
-	bool   batteryIsOk;
+	int    batteryIsOk : 1;
  }compiledStatus;
+
+typedef struct individualElementStatus
+{
+	status individualStatus;
+	int    batteryIsOk : 1 ;
+}individualElementStatus;
 
 #endif
