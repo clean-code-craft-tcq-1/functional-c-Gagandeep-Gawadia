@@ -3,36 +3,60 @@
 #include <string.h>
 #include "typedef.h"
 
+
+individualElementStatus computeElementStatus(float monitoredElementValue, float elementMinRange, float elementMaxRange)
+{
+	individualElementStatus parameterStatus;
+	parameterStatus.batteryIsOk = 1;
+
+	if (monitoredElementValue < elementMinRange)
+	{
+		parameterStatus.individualStatus = belowRange;
+		parameterStatus.batteryIsOk = 0;
+
+	}
+	else if (monitoredElementValue > elementMaxRange)
+	{
+		parameterStatus.individualStatus = aboveRange;
+		parameterStatus.batteryIsOk = 0;
+	}
+	else
+	{
+		parameterStatus.individualStatus = inRange;
+		
+	}
+	return parameterStatus;
+
+}
 compiledStatus computeBatteryState(float monitoredElementValue[noOfElements], float elementMinRange[noOfElements], float elementMaxRange[noOfElements]) {
 	
 	compiledStatus current_status;
 	
-	//Intialize overall status for every input, the status is inRange by default
+	//Intialize overall status for every input 
 	memset((void*)&current_status , 0, (sizeof(compiledStatus)));
-	current_status.batteryIsOk = true;
+	current_status.batteryIsOk = 1; // initialise battery status to ok once at the beginning 
 
-	for (int elementNo = 0; elementNo < noOfElements; elementNo++)
-	{
-		if (monitoredElementValue[elementNo] < elementMinRange[elementNo])
-		{
-			current_status.elementStatus[elementNo] = belowRange;
-			current_status.batteryIsOk = false;
+	individualElementStatus parameterStatus;
+	memset((void*)&parameterStatus, 0, (sizeof(individualElementStatus)));
+	parameterStatus.batteryIsOk = 1;
 
-		}
-		else if (monitoredElementValue[elementNo] > elementMaxRange[elementNo])
-		{
-			current_status.elementStatus[elementNo] = aboveRange;
-			current_status.batteryIsOk = false;
-		}
-		//else
-		//{
-		//	current_status.elementStatus[elementNo] = inRange;
-			//current_status.batteryIsOk = true; // do not overwrite true at anytime once the bit is set to false
-		//}
-	}
+	parameterStatus = computeElementStatus(monitoredElementValue[temp], elementMinRange[temp], elementMaxRange[temp]);
+	current_status.elementStatus[temp] = parameterStatus.individualStatus;
+	current_status.batteryIsOk &= parameterStatus.batteryIsOk;
+
+	 parameterStatus = computeElementStatus(monitoredElementValue[soc], elementMinRange[soc], elementMaxRange[soc]);
+	 current_status.elementStatus[soc] = parameterStatus.individualStatus;
+	 current_status.batteryIsOk &= parameterStatus.batteryIsOk;
+
+	 parameterStatus = computeElementStatus(monitoredElementValue[chargeRate], elementMinRange[chargeRate], elementMaxRange[chargeRate]);
+         current_status.elementStatus[chargeRate] = parameterStatus.individualStatus;
+     
+	 current_status.batteryIsOk &= parameterStatus.batteryIsOk;
+	
 
 	return current_status;
 }
+
 
 int main() {
 
@@ -120,4 +144,3 @@ int main() {
 	assert(battery_status.batteryIsOk);
 
 }
-
